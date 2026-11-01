@@ -1,6 +1,7 @@
 package com.poolsight
 
 import android.app.*
+import androidx.core.app.NotificationCompat
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.PixelFormat
