@@ -30,9 +30,26 @@ jobs:
           gradle-version: '8.6'
 
       - name: Build debug APK
-        run: gradle assembleDebug --no-daemon
+        run: |
+          gradle assembleDebug --no-daemon > build_log.txt 2>&1 || {
+            echo "=== BUILD FAILED. Extracting errors for GitHub Annotations: ==="
+            grep -i -E "error:|e: |FAILURE:|What went wrong:|Caused by:" build_log.txt | head -n 15 | while IFS= read -r line; do
+              echo "::error::$line"
+            done
+            echo "============================================================="
+            exit 1
+          }
+
+      - name: Upload Build Log if Failed
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log
+          path: build_log.txt
+          retention-days: 3
 
       - name: Upload APK
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: PoolSight-debug
